@@ -9,14 +9,14 @@ huggingface/
 hf_cache/
 
 # outputs
-models/
+# models/
 checkpoints/
 runs/
 logs/
 plots/
 
 # data
-data/
+# data/
 *.parquet
 *.csv
 *.jsonl
