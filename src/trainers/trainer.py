@@ -84,6 +84,11 @@ def train_model(
             global_step += 1
             progress_bar.set_postfix({"train_loss": f"{loss.item():.4f}"})
 
+            #print loss
+            if global_step % 100 == 0:
+                print(f"Step {global_step}, Loss = {loss.item():.4f}")
+
+
             # Step-level checkpoint
             if save_path and global_step % save_every == 0:
                 step_dir = f"{save_path}_step{global_step}"
