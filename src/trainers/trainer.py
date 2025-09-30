@@ -69,7 +69,7 @@ def train_model(
         for batch in progress_bar:
             batch = {k: v.to(device) for k, v in batch.items()}
 
-            with torch.cuda.amp.autocast(enabled=use_amp):
+            with torch.amp.autocast("cuda", enabled=use_amp):
                 outputs = model(**batch)
                 loss = outputs.loss
 
