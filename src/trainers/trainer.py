@@ -33,8 +33,9 @@ def train_model(
         num_training_steps=num_training_steps
     )
 
-    scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
-
+    # scaler = torch.cuda.amp.GradScaler(enabled=use_amp) #depriciated
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+    
     start_epoch = 0
     global_step = 0
 
@@ -72,6 +73,9 @@ def train_model(
             with torch.amp.autocast("cuda", enabled=use_amp):
                 outputs = model(**batch)
                 loss = outputs.loss
+
+            if loss.dim() > 0:
+                loss = loss.mean()
 
             total_loss += loss.item()
 
