@@ -18,7 +18,8 @@ def train_model(
     save_every=2000,
     resume_checkpoint=None,
     use_amp=True,
-    tokenizer=None  
+    tokenizer=None,
+    repo_id=None,  
 ):
     """
     Training loop with epoch + step checkpointing.
@@ -95,25 +96,25 @@ def train_model(
                 print(f"Step {global_step}, Loss = {loss.item():.4f}")
 
 
-            # Step-level checkpoint
-            if save_path and global_step % save_every == 0:
-                step_dir = f"{save_path}_step{global_step}"
-                os.makedirs(step_dir, exist_ok=True)
-                torch.save({
-                    "model_state_dict": model.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "scheduler_state_dict": lr_scheduler.state_dict(),
-                    "scaler_state_dict": scaler.state_dict() if use_amp else None,
-                    "global_step": global_step,
-                    "epoch": epoch
-                }, os.path.join(step_dir, "checkpoint.pt"))
-                print(f"Checkpoint saved at {step_dir}")
+            # # Step-level checkpoint
+            # if save_path and global_step % save_every == 0:
+                # step_dir = f"{save_path}_step{global_step}"
+                # os.makedirs(step_dir, exist_ok=True)
+                # torch.save({
+                #     "model_state_dict": model.state_dict(),
+                #     "optimizer_state_dict": optimizer.state_dict(),
+                #     "scheduler_state_dict": lr_scheduler.state_dict(),
+                #     "scaler_state_dict": scaler.state_dict() if use_amp else None,
+                #     "global_step": global_step,
+                #     "epoch": epoch
+                # }, os.path.join(step_dir, "checkpoint.pt"))
+                # print(f"Checkpoint saved at {step_dir}")
 
-                # keep last 2 step checkpoints
-                all_ckpts = sorted(glob.glob(f"{save_path}_step*"), key=os.path.getmtime)
-                if len(all_ckpts) > 2:
-                    shutil.rmtree(all_ckpts[0])
-                    print(f"Deleted old checkpoint: {all_ckpts[0]}")
+                # # keep last 2 step checkpoints
+                # all_ckpts = sorted(glob.glob(f"{save_path}_step*"), key=os.path.getmtime)
+                # if len(all_ckpts) > 2:
+                #     shutil.rmtree(all_ckpts[0])
+                #     print(f"Deleted old checkpoint: {all_ckpts[0]}")
 
         avg_loss = total_loss / len(train_loader)
         train_losses.append(avg_loss)
@@ -136,15 +137,15 @@ def train_model(
             epoch_dir = save_path 
             # epoch_dir = f"{save_path}_epoch{epoch+1}"
             os.makedirs(epoch_dir, exist_ok=True)
-            torch.save({
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "scheduler_state_dict": lr_scheduler.state_dict(),
-                "scaler_state_dict": scaler.state_dict() if use_amp else None,
-                "global_step": global_step,
-                "epoch": epoch,
-            }, os.path.join(epoch_dir, "checkpoint.pt"))
-            print(f"Checkpoint saved for epoch {epoch} at {epoch_dir}")
+            # torch.save({
+            #     "model_state_dict": model.state_dict(),
+            #     "optimizer_state_dict": optimizer.state_dict(),
+            #     "scheduler_state_dict": lr_scheduler.state_dict(),
+            #     "scaler_state_dict": scaler.state_dict() if use_amp else None,
+            #     "global_step": global_step,
+            #     "epoch": epoch,
+            # }, os.path.join(epoch_dir, "checkpoint.pt"))
+            # print(f"Checkpoint saved for epoch {epoch} at {epoch_dir}")
 
             if epoch == epochs-1:
                 if isinstance(model, torch.nn.DataParallel):
@@ -158,7 +159,7 @@ def train_model(
                 api = HfApi()
                 api.upload_folder(
                     folder_path=save_path,
-                    repo_id="anuragupperwal/teacher-finetuned-roberta",
+                    repo_id=repo_id,
                     repo_type="model"
                 )
                 print(f"Pushed epoch {epoch+1} to HuggingFace Hub")
