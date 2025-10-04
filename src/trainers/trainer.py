@@ -5,6 +5,7 @@ from transformers import get_scheduler
 from tqdm.auto import tqdm
 from torch.nn import CrossEntropyLoss
 from sklearn.metrics import f1_score
+from huggingface_hub import HfApi
 
 def train_model(
     model,
@@ -16,7 +17,8 @@ def train_model(
     save_path=None,
     save_every=2000,
     resume_checkpoint=None,
-    use_amp=True 
+    use_amp=True,
+    tokenizer=None  
 ):
     """
     Training loop with epoch + step checkpointing.
@@ -142,6 +144,24 @@ def train_model(
                 "epoch": epoch,
             }, os.path.join(epoch_dir, "checkpoint.pt"))
             print(f"Checkpoint saved at {epoch_dir}")
+
+            if epoch == epochs-1:
+                if isinstance(model, torch.nn.DataParallel):
+                    model.module.save_pretrained(epoch_dir)
+                else:
+                    model.save_pretrained(epoch_dir)
+                if tokenizer:
+                    tokenizer.save_pretrained(epoch_dir) 
+
+                # push to HuggingFace Hub
+                api = HfApi()
+                api.upload_folder(
+                    folder_path=save_path,
+                    repo_id="anuragupperwal/teacher-finetuned-roberta",
+                    repo_type="model"
+                )
+                print(f"Pushed epoch {epoch+1} to HuggingFace Hub")
+
 
             # keep last 2 epoch checkpoints
             all_epochs = sorted(glob.glob(f"{save_path}_epoch*"), key=os.path.getmtime)
