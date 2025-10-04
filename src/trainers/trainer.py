@@ -133,7 +133,8 @@ def train_model(
 
         # Epoch-level checkpoint
         if save_path:
-            epoch_dir = f"{save_path}_epoch{epoch+1}"
+            epoch_dir = save_path 
+            # epoch_dir = f"{save_path}_epoch{epoch+1}"
             os.makedirs(epoch_dir, exist_ok=True)
             torch.save({
                 "model_state_dict": model.state_dict(),
@@ -143,7 +144,7 @@ def train_model(
                 "global_step": global_step,
                 "epoch": epoch,
             }, os.path.join(epoch_dir, "checkpoint.pt"))
-            print(f"Checkpoint saved at {epoch_dir}")
+            print(f"Checkpoint saved for epoch {epoch} at {epoch_dir}")
 
             if epoch == epochs-1:
                 if isinstance(model, torch.nn.DataParallel):
