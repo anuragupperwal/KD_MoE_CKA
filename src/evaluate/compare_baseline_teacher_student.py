@@ -11,6 +11,13 @@ from sklearn.metrics import (
     confusion_matrix, classification_report, roc_auc_score
 )
 
+#suppress only that specific error - `additional_chat_templates does not exist on "main"`
+os.environ["TRANSFORMERS_SKIP_CHAT_TEMPLATE_WARNINGS"] = "1"
+import transformers.utils.hub as hub
+def _safe_list_repo_templates(*args, **kwargs):
+    return []  # Pretend no templates exist
+hub.list_repo_templates = _safe_list_repo_templates
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MODELS = {
