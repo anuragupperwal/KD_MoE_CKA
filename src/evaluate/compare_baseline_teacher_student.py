@@ -1,3 +1,5 @@
+import os
+import json
 import torch
 import pandas as pd
 import numpy as np
@@ -8,7 +10,6 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_auc_score
 )
-import json, os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -32,8 +33,8 @@ label_names = ["World", "Sports", "Business", "Sci/Tech"]
 def evaluate_model(model_name, model_id):
     print(f"\nEvaluating: {model_name} ({model_id})")
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForSequenceClassification.from_pretrained(model_id).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+    model = AutoModelForSequenceClassification.from_pretrained(model_id, trust_remote_code=True).to(device)
     model.eval()
 
     all_preds, all_probs, all_labels = [], [], []
@@ -41,7 +42,13 @@ def evaluate_model(model_name, model_id):
     for i in tqdm(range(0, len(texts), BATCH_SIZE)):
         batch_texts = texts[i : i + BATCH_SIZE]
         batch_labels = labels[i : i + BATCH_SIZE]
-        inputs = tokenizer(batch_texts, truncation=True, padding=True, max_length=MAX_LENGTH, return_tensors="pt").to(device)
+        inputs = tokenizer(
+            batch_texts,
+            truncation=True,
+            padding=True,
+            max_length=MAX_LENGTH,
+            return_tensors="pt"
+        ).to(device)
 
         with torch.no_grad():
             outputs = model(**inputs)
@@ -114,3 +121,4 @@ with open(f"{RESULTS_DIR}/comparison_summary.md", "w") as f:
 print("\nMODEL PERFORMANCE COMPARISON")
 print(md_table)
 print("\nDetailed metrics saved to:", RESULTS_DIR)
+
