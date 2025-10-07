@@ -33,8 +33,8 @@ label_names = ["World", "Sports", "Business", "Sci/Tech"]
 def evaluate_model(model_name, model_id):
     print(f"\nEvaluating: {model_name} ({model_id})")
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-    model = AutoModelForSequenceClassification.from_pretrained(model_id, trust_remote_code=True).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=False, revision="main")
+    model = AutoModelForSequenceClassification.from_pretrained(model_id, trust_remote_code=False, revision="main").to(device)
     model.eval()
 
     all_preds, all_probs, all_labels = [], [], []
