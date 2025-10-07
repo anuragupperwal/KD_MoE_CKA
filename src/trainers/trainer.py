@@ -147,15 +147,16 @@ def train_model(
             # }, os.path.join(epoch_dir, "checkpoint.pt"))
             # print(f"Checkpoint saved for epoch {epoch} at {epoch_dir}")
 
-            if epoch == epochs-1:
-                if isinstance(model, torch.nn.DataParallel):
-                    model.module.save_pretrained(epoch_dir)
-                else:
-                    model.save_pretrained(epoch_dir)
-                if tokenizer:
-                    tokenizer.save_pretrained(epoch_dir) 
+            if isinstance(model, torch.nn.DataParallel):
+                model.module.save_pretrained(epoch_dir)
+            else:
+                model.save_pretrained(epoch_dir)
+            if tokenizer:
+                tokenizer.save_pretrained(epoch_dir)
 
+            if repo_id and (epoch == epochs - 1):
                 # push to HuggingFace Hub
+                print(f"Uploading model to Hugging Face Hub → {repo_id}")
                 api = HfApi()
                 api.upload_folder(
                     folder_path=save_path,
