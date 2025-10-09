@@ -35,11 +35,6 @@ def get_dataset_and_tokenizer(
     val_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     test_ds.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
 
-
-    tokenized = dataset.map(tokenize_fn, batched=True)
-    tokenized = tokenized.rename_column("label", "labels")
-    tokenized.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
-
     print(f"Train: {len(train_ds)} | Validation: {len(val_ds)} | Test: {len(test_ds)}")
     return train_ds, val_ds, test_ds, tokenizer
 
