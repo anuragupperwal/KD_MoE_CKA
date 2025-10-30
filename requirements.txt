@@ -1,0 +1,13 @@
+scikit-learn
+huggingface_hub
+transformers==4.44.2
+python-dotenv
+nltk 
+rouge-score 
+bert-score 
+scikit-learn
+# google-generativeai
+indic-nlp-library
+sacrebleu
+sentence_transformers
+accelerate
